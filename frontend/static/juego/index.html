@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Juego de Clasificación de Insectos</title>
+
+<!-- LeaderLine para dibujar flechas -->
+<script src="https://cdn.jsdelivr.net/npm/leader-line@1.0.7/leader-line.min.js"></script>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #f9fafb;
+  margin: 0;
+  padding: 20px;
+  text-align: center;
+}
+
+/* --- Clasificación --- */
+#contenedor {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+.caja {
+  width: 40%;
+  min-height: 250px;
+  border: 3px dashed #9ca3af;
+  border-radius: 15px;
+  background-color: #f3f4f6;
+  padding: 10px;
+  transition: background-color 0.3s;
+}
+
+.caja.over { background-color: #d1fae5; }
+
+.draggable {
+  width: 160px;
+  height: 160px;
+  object-fit: contain;
+  margin: 8px;
+  cursor: grab;
+  border-radius: 10px;
+  box-shadow: 0 0 6px rgba(0,0,0,0.3);
+  background-color: white;
+}
+
+#resultado { margin-top: 20px; font-weight: bold; font-size: 1.2em; }
+
+/* --- Parte 2: Construcción --- */
+#parteConstruccion { display: none; text-align: center; margin-top: 40px; }
+
+#zonaJuego {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+  width: 100%;
+  height: 80vh;
+}
+
+#cuerpoInsecto {
+  position: relative;
+  width: 600px;
+  height: 700px;
+  border: 2px solid #444;
+  border-radius: 10px;
+  background-color: white;
+  overflow: hidden;
+}
+
+.zona {
+  position: absolute;
+  width: 80px;
+  height: 60px;
+  border: 2px dashed transparent;
+  border-radius: 8px;
+  transition: 0.2s;
+}
+
+.zona:hover { border-color: #3b82f6; }
+
+#etiquetasPartes { display: flex; flex-direction: column; gap: 15px; }
+
+.etiqueta {
+  background-color: #3b82f6;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.2s;
+}
+.etiqueta:hover { background-color: #2563eb; }
+.etiqueta.seleccionada { background-color: #16a34a !important; }
+
+#resultadoPartes { margin-top: 20px; font-size: 1.1em; }
+
+textarea#justificacion {
+  width: 80%;
+  max-width: 600px;
+  margin-top: 10px;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+/* --- Modal final --- */
+#modalFinal {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.6);
+  justify-content: center;
+  align-items: center;
+}
+#modalContenido {
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
+  text-align: center;
+  width: 60%;
+  max-width: 600px;
+}
+#modalContenido button {
+  margin-top: 16px;
+  padding: 10px 18px;
+  border-radius: 8px;
+  background: #28a745;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+</style>
+</head>
+<body>
+
+<h1>🐜 Clasificación de Insectos</h1>
+<p>Arrastra cada imagen hacia "Insecto" o "No insecto".</p>
+
+<div id="contenedor">
+  <div id="cajaInsecto" class="caja"><h3>Insecto</h3></div>
+  <div id="cajaNoInsecto" class="caja"><h3>No insecto</h3></div>
+</div>
+
+<div id="imagenes"></div>
+
+<button id="validar">Validar clasificación</button>
+<div id="resultado"></div>
+
+<!-- ============== PARTE 2 ============== -->
+<div id="parteConstruccion">
+  <h2>🧠 Construye el Insecto</h2>
+  <p>Haz clic en una etiqueta y luego en cualquier punto del insecto para crear la conexión.<br>
+     Si la imagen no corresponde a un insecto, justifica por qué no colocas las partes (mínimo 15 palabras).</p>
+
+  <div id="zonaJuego">
+    <div id="cuerpoInsecto">
+      <img id="insectoBase" src="1.png" alt="Insecto base" style="width:100%; height:auto;">
+    </div>
+
+    <div id="etiquetasPartes">
+      <span class="etiqueta" data-parte="Cabeza">Cabeza</span>
+      <span class="etiqueta" data-parte="Tórax">Tórax</span>
+      <span class="etiqueta" data-parte="Abdomen">Abdomen</span>
+      <span class="etiqueta" data-parte="Antenas">Antenas</span>
+      <span class="etiqueta" data-parte="Alas">Alas</span>
+      <span class="etiqueta" data-parte="Patas">Patas</span>
+    </div>
+  </div>
+
+  <textarea id="justificacion" placeholder="Escribe aquí tu justificación si no colocas las partes del insecto..."></textarea><br>
+  <button id="validarPartes">Validar partes</button>
+  <div id="resultadoPartes"></div>
+</div>
+
+<!-- ============== MODAL FINAL ============== -->
+<div id="modalFinal">
+  <div id="modalContenido">
+    <h2>Resumen Final</h2>
+    <div id="resumenTexto" style="white-space: pre-wrap;"></div>
+    <button onclick="location.reload()">Salir del juego</button>
+  </div>
+</div>
+
+<script>
+// ---------- Config y estado ----------
+const imagenesInsectos = [1,2,3,4,5,6,7,8,10,11,15,16,17,18,20,21,22,24,27];
+let correctos = 0;
+let incorrectos = 0;
+
+// referencias DOM
+const contenedorImagenes = document.getElementById('imagenes');
+const cajaInsecto = document.getElementById('cajaInsecto');
+const cajaNoInsecto = document.getElementById('cajaNoInsecto');
+
+// ---------- Crear imágenes 1..27 ----------
+for (let i = 1; i <= 27; i++) {
+  const img = document.createElement('img');
+  img.src = `${i}.png`;
+  img.className = 'draggable';
+  img.draggable = true;
+  img.dataset.numero = i;
+  // agregar handler de dragstart (aquí se hace en el momento de creación)
+  img.addEventListener('dragstart', e => {
+    e.dataTransfer.setData('text/plain', e.target.dataset.numero);
+    // guardamos referencia global al elemento arrastrado
+    window._arrastrada = e.target;
+  });
+  contenedorImagenes.appendChild(img);
+}
+
+// ---------- Drag & Drop (cajas) ----------
+const cajas = document.querySelectorAll('.caja');
+
+cajas.forEach(caja => {
+  caja.addEventListener('dragover', e => e.preventDefault());
+  caja.addEventListener('dragenter', e => caja.classList.add('over'));
+  caja.addEventListener('dragleave', e => caja.classList.remove('over'));
+  caja.addEventListener('drop', e => {
+    e.preventDefault();
+    caja.classList.remove('over');
+    const elem = window._arrastrada;
+    if (!elem) return;
+    // append only if not already in this container (allows one per image)
+    caja.appendChild(elem);
+  });
+});
+
+// ---------- Validar clasificación (NO bloquea avance) ----------
+document.getElementById('validar').addEventListener('click', () => {
+  correctos = 0;
+  incorrectos = 0;
+
+  // Evalúa cada imagen
+  document.querySelectorAll('.draggable').forEach(img => {
+    const num = parseInt(img.dataset.numero, 10);
+    const enInsecto = img.parentElement && img.parentElement.id === 'cajaInsecto';
+    const esInsecto = imagenesInsectos.includes(num);
+
+    if ((enInsecto && esInsecto) || (!enInsecto && !esInsecto)) {
+      img.style.border = '3px solid #22c55e';
+      correctos++;
+    } else {
+      img.style.border = '3px solid #ef4444';
+      incorrectos++;
+    }
+    // bloquear movimiento después de validar (no se puede corregir)
+    img.draggable = false;
+  });
+
+  document.getElementById('resultado').innerHTML = `✅ Correctas: ${correctos} &nbsp;&nbsp; ❌ Incorrectas: ${incorrectos}`;
+
+  // Permitir siempre avanzar; si hay errores mostramos advertencia informativa
+  setTimeout(() => {
+    if (incorrectos > 0) {
+      // aviso informativo (no bloqueante)
+      alert("⚠️ Tienes algunas imágenes mal clasificadas. Aun así puedes continuar y justificar en la Parte 2.");
+    }
+    // Mostrar Parte 2 y seleccionar imagen aleatoria de las 27 como base
+    document.getElementById('parteConstruccion').style.display = 'block';
+    const r = Math.floor(Math.random() * 27) + 1;
+    document.getElementById('insectoBase').src = `${r}.png`;
+    // desplazar arriba
+    window.scrollTo(0, 0);
+  }, 600);
+});
+
+
+// ---------------- PARTE 2: conexión etiquetas -> punto en imagen con LeaderLine ----------------
+let conexiones = []; // {etiqueta: "Cabeza", punto: DOMElement, line: LeaderLine}
+
+// manejar selección de etiqueta
+document.querySelectorAll('.etiqueta').forEach(et => {
+  et.addEventListener('click', () => {
+    // activar/desactivar selección visual
+    if (et.classList.contains('seleccionada')) {
+      et.classList.remove('seleccionada');
+      et.style.backgroundColor = '#3b82f6';
+      window._etiquetaSeleccionada = null;
+      return;
+    }
+    // quitar selección previa
+    document.querySelectorAll('.etiqueta').forEach(e => {
+      e.classList.remove('seleccionada');
+      e.style.backgroundColor = '#3b82f6';
+    });
+    et.classList.add('seleccionada');
+    et.style.backgroundColor = '#16a34a';
+    window._etiquetaSeleccionada = et; // guardamos etiqueta seleccionada
+  });
+});
+
+// cuando hacen click sobre el cuerpo del insecto y hay etiqueta seleccionada, se crea punto + línea
+document.getElementById('cuerpoInsecto').addEventListener('click', e => {
+  const etiqueta = window._etiquetaSeleccionada;
+  if (!etiqueta) return; // no hay etiqueta activa
+
+  const cuerpo = document.getElementById('cuerpoInsecto');
+  const rect = cuerpo.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+
+  // crear punto visual (pequeño) en la imagen
+  const punto = document.createElement('div');
+  punto.style.position = 'absolute';
+  punto.style.width = '10px';
+  punto.style.height = '10px';
+  punto.style.background = '#16a34a';
+  punto.style.borderRadius = '50%';
+  punto.style.left = (x - 5) + 'px';
+  punto.style.top = (y - 5) + 'px';
+  punto.style.pointerEvents = 'auto';
+  cuerpo.appendChild(punto);
+
+  // Si ya existe una conexión para esa etiqueta, la eliminamos (permite corregir la misma etiqueta)
+  const existente = conexiones.find(c => c.etiqueta === etiqueta.dataset.parte);
+  if (existente) {
+    try { existente.line.remove(); } catch (err) {}
+    // quitar punto DOM previo
+    if (existente.punto && existente.punto.parentElement) existente.punto.parentElement.removeChild(existente.punto);
+    conexiones = conexiones.filter(c => c.etiqueta !== etiqueta.dataset.parte);
+  }
+
+  // crear la linea con LeaderLine
+  const line = new LeaderLine(
+    LeaderLine.pointAnchor(etiqueta, { x: '100%', y: '50%' }),
+    LeaderLine.pointAnchor(punto, { x: '50%', y: '50%' }),
+    { color: '#16a34a', path: 'straight', endPlug: 'arrow3' }
+  );
+
+  conexiones.push({ etiqueta: etiqueta.dataset.parte, punto: punto, line: line });
+
+  // deseleccionar etiqueta
+  etiqueta.classList.remove('seleccionada');
+  etiqueta.style.backgroundColor = '#ccc';
+  window._etiquetaSeleccionada = null;
+});
+
+// ---------- Validar Parte 2 ----------
+document.getElementById('validarPartes').addEventListener('click', () => {
+  const numConexiones = conexiones.length;
+  const resultadoPartes = document.getElementById('resultadoPartes');
+  const justText = document.getElementById('justificacion').value.trim();
+  const palabras = justText.split(/\s+/).filter(p => p).length;
+
+  if (numConexiones === 6) {
+    resultadoPartes.innerHTML = "✅ ¡Excelente! Has conectado correctamente las 6 partes del insecto.";
+    // mostrar resumen final (sin exigir justificación)
+    mostrarResumenFinal(true, justText);
+  } else {
+    // no completó 6 conexiones -> exigir justificación de al menos 15 palabras
+    if (palabras < 15) {
+      alert("Debes escribir al menos 15 palabras de justificación si no completas las 6 partes.");
+      return;
+    } else {
+      resultadoPartes.innerHTML = "❌ No completaste las 6 partes, justificaste correctamente.";
+      mostrarResumenFinal(false, justText);
+    }
+  }
+});
+
+// ---------- Modal final (muestra conteo y SOLO el texto de justificación) ----------
+function mostrarResumenFinal(completo, justificacionTexto) {
+  const modal = document.getElementById('modalFinal');
+  const resumen = document.getElementById('resumenTexto');
+
+  resumen.innerHTML = `✅ Correctas: ${correctos} &nbsp;&nbsp; ❌ Incorrectas: ${incorrectos}\n\n` +
+                      (completo ? "🟢 Completaste las 6 partes correctamente.\n\n" : "🔴 No completaste las 6 partes.\n\n") +
+                      (justificacionTexto ? justificacionTexto : "");
+
+  modal.style.display = 'flex';
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ actividad.title }} — Curso</title>
+<style>
+  :root{
+    --bg:#0A0E17; --panel:#121826; --card:#1A1F36;
+    --cyan:#00D4FF; --purple:#7B61FF; --text:#E8EDF5; --muted:#8fa3bf;
+    --border:#00D4FF30;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; background:var(--bg); color:var(--text); font-family:'Segoe UI', Arial, sans-serif;}
+  .topbar{
+    padding:16px 24px; border-bottom:1px solid var(--border); background:var(--panel);
+    display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; z-index:10;
+  }
+  .topbar a{color:var(--cyan); text-decoration:none; font-size:0.9rem;}
+
+  .wrap{max-width:820px; margin:0 auto; padding:30px 20px 60px;}
+  .eyebrow{color:var(--muted); font-size:0.8rem; margin-bottom:6px;}
+  h1{color:var(--cyan); font-size:1.6rem; margin:0 0 20px;}
+
+  .contenido{
+    background:var(--panel); border:1px solid var(--border); border-radius:12px;
+    padding:24px; line-height:1.65; font-size:0.95rem;
+  }
+  .contenido img{ max-width:100%; height:auto; border-radius:8px; }
+  .contenido video{ max-width:100%; border-radius:8px; }
+  .contenido a{ color:var(--cyan); }
+
+  .link-externo{
+    display:inline-block; margin-top:16px; padding:10px 18px; border-radius:10px;
+    background:linear-gradient(135deg, var(--cyan), var(--purple)); color:#0A0E17;
+    text-decoration:none; font-weight:bold; font-size:0.88rem;
+  }
+
+  .archivos{ margin-top:18px; }
+  .archivo-item{
+    display:flex; align-items:center; gap:8px; padding:10px 14px; background:var(--card);
+    border-radius:8px; margin-bottom:8px; font-size:0.88rem;
+  }
+  .archivo-item a{ color:var(--cyan); text-decoration:none; font-weight:bold; }
+
+  .seccion-extra{
+    margin-top:24px; background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:22px;
+  }
+  .seccion-extra h2{ color:var(--cyan); font-size:1.1rem; margin:0 0 14px; }
+
+  textarea, input[type="file"]{
+    width:100%; padding:10px; border-radius:8px; border:1px solid var(--border);
+    background:var(--card); color:var(--text); font-family:inherit; font-size:0.88rem;
+  }
+  textarea{ min-height:90px; resize:vertical; }
+  .btn{
+    margin-top:12px; padding:10px 20px; border-radius:8px; border:none; cursor:pointer;
+    background:linear-gradient(135deg, var(--cyan), var(--purple)); color:#0A0E17; font-weight:bold; font-size:0.88rem;
+  }
+
+  .entrega-actual{
+    background:rgba(0,212,255,0.08); border:1px solid var(--border); border-radius:8px;
+    padding:12px 16px; margin-bottom:16px; font-size:0.86rem;
+  }
+
+  .respuesta-item{
+    padding:12px 14px; background:var(--card); border-radius:8px; margin-bottom:10px; font-size:0.87rem;
+  }
+  .respuesta-item .autor{ color:var(--cyan); font-weight:bold; font-size:0.8rem; margin-bottom:4px; }
+  .respuesta-item .fecha{ color:var(--muted); font-size:0.72rem; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="/curso">← Volver al curso</a>
+  <span style="color:var(--muted); font-size:0.85rem;">{{ seccion.name }}</span>
+</div>
+
+<div class="wrap">
+  <div class="eyebrow">{{ actividad.type|upper }}</div>
+  <h1>{{ actividad.title }}</h1>
+
+  <div class="contenido">
+    {% if actividad.content_html %}
+      {{ actividad.content_html | safe }}
+    {% endif %}
+
+    {% if actividad.external_url %}
+      <a class="link-externo" href="{{ actividad.external_url }}" target="_blank">Abrir enlace →</a>
+    {% endif %}
+
+    {% if actividad.files %}
+      <div class="archivos">
+        {% for f in actividad.files %}
+          <div class="archivo-item">
+            📎 <a href="{{ f.url }}" target="_blank">{{ f.filename }}</a>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+
+  {% if actividad.type == 'assign' %}
+  <div class="seccion-extra">
+    <h2>📤 Entregar tarea</h2>
+
+    {% if entrega %}
+    <div class="entrega-actual">
+      ✅ Ya entregaste: <strong>{{ entrega.nombre_archivo }}</strong>
+      ({{ entrega.fecha_entrega.strftime('%d/%m/%Y %H:%M') }})<br>
+      Puedes volver a subir un archivo para reemplazar tu entrega.
+    </div>
+    {% endif %}
+
+    <form action="/curso/tarea/{{ actividad.moduleid }}/entregar" method="POST" enctype="multipart/form-data">
+      <input type="file" name="archivo" required>
+      <textarea name="comentario" placeholder="Comentario opcional para el profesor..."></textarea>
+      <button type="submit" class="btn">Subir entrega</button>
+    </form>
+  </div>
+  {% endif %}
+
+  {% if actividad.type == 'forum' %}
+  <div class="seccion-extra">
+    <h2>💬 Respuestas del foro</h2>
+
+    {% if respuestas %}
+      {% for r in respuestas %}
+      <div class="respuesta-item">
+        <div class="autor">{{ r.usuario.nombre_usuario if r.usuario else 'Anónimo' }}</div>
+        {{ r.contenido }}
+        <div class="fecha">{{ r.fecha_publicacion.strftime('%d/%m/%Y %H:%M') }}</div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <p style="color:var(--muted); font-size:0.87rem;">Sé el primero en responder.</p>
+    {% endif %}
+
+    <form action="/curso/foro/{{ actividad.moduleid }}/responder" method="POST" style="margin-top:16px;">
+      <textarea name="contenido" placeholder="Escribe tu respuesta..." required></textarea>
+      <button type="submit" class="btn">Publicar respuesta</button>
+    </form>
+  </div>
+  {% endif %}
+</div>
+
+</body>
+</html>

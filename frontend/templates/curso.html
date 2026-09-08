@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Curso — {{ curso.course_title }}</title>
+<style>
+  :root{
+    --bg:#0A0E17; --panel:#121826; --card:#1A1F36;
+    --cyan:#00D4FF; --purple:#7B61FF; --text:#E8EDF5; --muted:#8fa3bf;
+    --border:#00D4FF30;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; background:var(--bg); color:var(--text); font-family:'Segoe UI', Arial, sans-serif;}
+  .topbar{
+    padding:16px 24px; border-bottom:1px solid var(--border); background:var(--panel);
+    display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; z-index:10;
+  }
+  .topbar a{color:var(--cyan); text-decoration:none; font-size:0.9rem;}
+  .hero{padding:34px 20px 20px; text-align:center;}
+  .hero h1{color:var(--cyan); font-size:1.7rem; margin:0 0 8px;}
+  .hero p{color:var(--muted); font-size:0.9rem;}
+
+  .wrap{max-width:900px; margin:0 auto; padding:10px 20px 60px;}
+  .seccion{
+    background:var(--panel); border:1px solid var(--border); border-radius:12px;
+    margin-bottom:14px; overflow:hidden;
+  }
+  .seccion-head{
+    padding:16px 20px; cursor:pointer; display:flex; justify-content:space-between; align-items:center;
+    font-weight:bold; color:var(--cyan);
+  }
+  .seccion-head:hover{ background:rgba(0,212,255,0.05); }
+  .seccion-head .arrow{ transition:transform .2s ease; color:var(--muted); }
+  .seccion.open .seccion-head .arrow{ transform:rotate(90deg); }
+  .seccion-body{ display:none; padding:0 20px 16px; }
+  .seccion.open .seccion-body{ display:block; }
+
+  .actividad{
+    display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:8px;
+    text-decoration:none; color:var(--text); font-size:0.88rem; margin-bottom:4px;
+  }
+  .actividad:hover{ background:rgba(0,212,255,0.08); }
+  .badge-tipo{
+    font-size:0.65rem; padding:2px 7px; border-radius:10px; text-transform:uppercase;
+    border:1px solid var(--border); color:var(--muted); flex-shrink:0;
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="/dashboard">← Volver al dashboard</a>
+  <span style="color:var(--muted); font-size:0.85rem;">EntoBio · Curso</span>
+</div>
+
+<div class="hero">
+  <h1>📚 {{ curso.course_title }}</h1>
+  <p>Navega por los módulos del curso. Haz clic en cada sección para ver su contenido.</p>
+</div>
+
+<div class="wrap">
+  {% for seccion in curso.sections %}
+    {% if seccion.activities|length > 0 %}
+    <div class="seccion">
+      <div class="seccion-head" onclick="this.parentElement.classList.toggle('open')">
+        <span>{{ seccion.name }}</span>
+        <span class="arrow">▶</span>
+      </div>
+      <div class="seccion-body">
+        {% for act in seccion.activities %}
+          {% if act.type != 'subsection' %}
+          <a class="actividad" href="/curso/actividad/{{ act.moduleid }}">
+            <span class="badge-tipo">{{ act.type }}</span>
+            <span>{{ act.title }}</span>
+          </a>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  {% endfor %}
+</div>
+
+</body>
+</html>
