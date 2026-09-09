@@ -190,8 +190,16 @@ def serve_admin():
     return send_from_directory(app.template_folder, 'admin_login.html')
 
 @app.route('/juego')
+def redirigir_juego():
+    return redirect('/juego/')
+
+@app.route('/juego/')
 def serve_juego():
     return send_from_directory(app.static_folder, 'juego/index.html')
+
+@app.route('/juego/<path:filename>')
+def serve_juego_assets(filename):
+    return send_from_directory(os.path.join(app.static_folder, 'juego'), filename)
 
 # ===== CURSO: navegación de contenido (solo lectura, viene de curso_data.json) =====
 

@@ -178,6 +178,31 @@
         <div class="user-info">👤 <span id="userName">Cargando...</span></div>
     </div>
 
+    <!-- ===== HUB: Curso, Juego, Clave con orden recomendado ===== -->
+    <div class="card" style="margin-bottom:24px;">
+        <div class="card-title">🗺️ Tu ruta de aprendizaje</div>
+        <p style="color:#A0A0B0; font-size:0.88rem; margin-bottom:18px;">
+            Te recomendamos seguir este orden: primero el curso, luego el juego de práctica, y al final la clave taxonómica para poner a prueba lo aprendido.
+        </p>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px;">
+            <div onclick="window.location.href='/curso'" style="cursor:pointer; background:#1A1F36; border:1px solid #00D4FF30; border-radius:12px; padding:20px; transition:transform .15s ease;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='none'">
+                <div style="font-size:1.8rem;">1️⃣ 📚</div>
+                <div style="color:#00D4FF; font-weight:bold; margin:8px 0 4px;">Curso</div>
+                <div style="color:#A0A0B0; font-size:0.82rem;">Aprende los fundamentos: macrofotografía, fotogrametría y modelado 3D de insectos.</div>
+            </div>
+            <div onclick="window.location.href='/juego/'" style="cursor:pointer; background:#1A1F36; border:1px solid #00D4FF30; border-radius:12px; padding:20px; transition:transform .15s ease;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='none'">
+                <div style="font-size:1.8rem;">2️⃣ 🧩</div>
+                <div style="color:#00D4FF; font-weight:bold; margin:8px 0 4px;">Juego</div>
+                <div style="color:#A0A0B0; font-size:0.82rem;">Practica identificando qué es y qué no es un insecto, y construye su anatomía.</div>
+            </div>
+            <div onclick="iniciarIdentificacion()" style="cursor:pointer; background:#1A1F36; border:1px solid #00D4FF30; border-radius:12px; padding:20px; transition:transform .15s ease;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='none'">
+                <div style="font-size:1.8rem;">3️⃣ 🔬</div>
+                <div style="color:#00D4FF; font-weight:bold; margin:8px 0 4px;">Clave Taxonómica</div>
+                <div style="color:#A0A0B0; font-size:0.82rem;">Pon a prueba lo aprendido identificando especímenes reales de Linepithema.</div>
+            </div>
+        </div>
+    </div>
+
     <!-- Estadísticas rápidas -->
     <div class="stats-grid">
         <div class="stat-card">
@@ -239,9 +264,6 @@
 
     <!-- Botones -->
     <div class="flex-buttons">
-        <button class="btn btn-primary" id="btnIniciar" onclick="iniciarIdentificacion()">🔬 Iniciar identificación</button>
-        <button class="btn btn-secondary" onclick="window.location.href='/curso'">📚 Ir al curso</button>
-        <button class="btn btn-secondary" onclick="window.location.href='/juego'">🧩 Jugar</button>
         <button class="btn btn-secondary" id="btnEncuestas" onclick="irAEncuestas()">📝 Completar encuestas</button>
         <button class="btn btn-danger" onclick="cerrarSesion()">🔓 Cerrar sesión</button>
         <button class="btn-cert" id="btnCertificado" onclick="generarCertificado()">📜 Descargar certificado</button>
@@ -293,7 +315,8 @@
             if (!datosUsuario.grupo_asignado) {
                 grupoEl.textContent   = 'Sin asignar';
                 mensajeEl.textContent = '⚠️ Aún no tienes grupo asignado. Espera a que el administrador te asigne uno.';
-                document.getElementById('btnIniciar').disabled = true;
+                const btnI = document.getElementById('btnIniciar');
+                if (btnI) btnI.disabled = true;
             } else {
                 const descripciones = {
                     '2D':     'Usarás imágenes 2D para identificar las especies.',
@@ -343,8 +366,10 @@
             // Botón iniciar
             if (total >= 2) {
                 const btn = document.getElementById('btnIniciar');
-                btn.disabled = true;
-                btn.title    = 'Ya completaste las dos identificaciones';
+                if (btn) {
+                    btn.disabled = true;
+                    btn.title    = 'Ya completaste las dos identificaciones';
+                }
             }
 
             await verificarEncuestasPendientes();
