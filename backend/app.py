@@ -204,11 +204,21 @@ def serve_juego_assets(filename):
 # ===== CURSO: navegación de contenido (solo lectura, viene de curso_data.json) =====
 
 def _buscar_actividad(moduleid):
-    """Recorre CURSO_DATA para encontrar una actividad por su moduleid."""
-    for seccion in CURSO_DATA['sections']:
-        for act in seccion['activities']:
+    """Recorre CURSO_DATA (incluyendo subsecciones anidadas) para encontrar una actividad por su moduleid."""
+    def buscar_en_lista(actividades, seccion):
+        for act in actividades:
             if act['moduleid'] == str(moduleid):
                 return seccion, act
+            if act.get('children'):
+                encontrada = buscar_en_lista(act['children'], seccion)
+                if encontrada[1]:
+                    return encontrada
+        return seccion, None
+
+    for seccion in CURSO_DATA['sections']:
+        _, act = buscar_en_lista(seccion['activities'], seccion)
+        if act:
+            return seccion, act
     return None, None
 
 @app.route('/curso')

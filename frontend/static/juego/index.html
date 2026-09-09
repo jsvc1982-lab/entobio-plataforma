@@ -135,9 +135,28 @@ textarea#justificacion {
   border: none;
   cursor: pointer;
 }
+.topbar-juego{
+  position:sticky; top:0; z-index:100; background:#1f2937; color:white;
+  padding:10px 20px; display:flex; justify-content:space-between; align-items:center;
+  font-family:Arial, sans-serif; margin:-20px -20px 20px -20px;
+}
+.topbar-juego a, .topbar-juego button{
+  color:white; text-decoration:none; font-size:0.85rem; background:#374151; border:none;
+  padding:8px 14px; border-radius:8px; cursor:pointer;
+}
+.topbar-juego a:hover, .topbar-juego button:hover{ background:#4b5563; }
+.paso-indicador{
+  font-size:0.8rem; background:#3b82f6; padding:6px 14px; border-radius:20px; font-weight:bold;
+}
 </style>
 </head>
 <body>
+
+<div class="topbar-juego">
+  <a href="/dashboard">← Volver al dashboard</a>
+  <span class="paso-indicador" id="pasoIndicador">Paso 1 de 2 · Clasificación</span>
+  <button onclick="if(confirm('¿Reiniciar el juego desde el inicio?')) location.reload();">🔄 Reiniciar</button>
+</div>
 
 <h1>🐜 Clasificación de Insectos</h1>
 <p>Arrastra cada imagen hacia "Insecto" o "No insecto".</p>
@@ -183,7 +202,8 @@ textarea#justificacion {
   <div id="modalContenido">
     <h2>Resumen Final</h2>
     <div id="resumenTexto" style="white-space: pre-wrap;"></div>
-    <button onclick="location.reload()">Salir del juego</button>
+    <button onclick="location.reload()">🔄 Jugar de nuevo</button>
+    <button onclick="window.location.href='/dashboard'" style="background:#3b82f6; margin-left:10px;">← Volver al dashboard</button>
   </div>
 </div>
 
@@ -265,6 +285,9 @@ document.getElementById('validar').addEventListener('click', () => {
     document.getElementById('parteConstruccion').style.display = 'block';
     const r = Math.floor(Math.random() * 27) + 1;
     document.getElementById('insectoBase').src = `${r}.png`;
+    // actualizar indicador de progreso
+    const indicador = document.getElementById('pasoIndicador');
+    if (indicador) indicador.textContent = 'Paso 2 de 2 · Construcción';
     // desplazar arriba
     window.scrollTo(0, 0);
   }, 600);

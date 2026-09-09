@@ -17,34 +17,59 @@
     display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; z-index:10;
   }
   .topbar a{color:var(--cyan); text-decoration:none; font-size:0.9rem;}
-  .hero{padding:34px 20px 20px; text-align:center;}
-  .hero h1{color:var(--cyan); font-size:1.7rem; margin:0 0 8px;}
-  .hero p{color:var(--muted); font-size:0.9rem;}
+  .hero{padding:34px 20px 24px; text-align:center;}
+  .hero h1{color:var(--cyan); font-size:1.8rem; margin:0 0 8px;}
+  .hero p{color:var(--muted); font-size:0.92rem;}
 
-  .wrap{max-width:900px; margin:0 auto; padding:10px 20px 60px;}
-  .seccion{
-    background:var(--panel); border:1px solid var(--border); border-radius:12px;
-    margin-bottom:14px; overflow:hidden;
-  }
-  .seccion-head{
-    padding:16px 20px; cursor:pointer; display:flex; justify-content:space-between; align-items:center;
-    font-weight:bold; color:var(--cyan);
-  }
-  .seccion-head:hover{ background:rgba(0,212,255,0.05); }
-  .seccion-head .arrow{ transition:transform .2s ease; color:var(--muted); }
-  .seccion.open .seccion-head .arrow{ transform:rotate(90deg); }
-  .seccion-body{ display:none; padding:0 20px 16px; }
-  .seccion.open .seccion-body{ display:block; }
+  .wrap{max-width:1100px; margin:0 auto; padding:10px 20px 60px;}
 
-  .actividad{
-    display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:8px;
-    text-decoration:none; color:var(--text); font-size:0.88rem; margin-bottom:4px;
+  .modulos-grid{
+    display:grid; grid-template-columns:repeat(auto-fit, minmax(280px,1fr)); gap:18px; margin-top:10px;
   }
-  .actividad:hover{ background:rgba(0,212,255,0.08); }
+  .modulo-card{
+    background:linear-gradient(160deg, var(--panel), var(--card));
+    border:1px solid var(--border); border-radius:16px; padding:22px; cursor:pointer;
+    transition:transform .18s ease, box-shadow .18s ease;
+  }
+  .modulo-card:hover{ transform:translateY(-4px); box-shadow:0 12px 30px rgba(0,212,255,.10); }
+  .modulo-num{
+    display:inline-flex; align-items:center; justify-content:center; width:34px; height:34px;
+    border-radius:50%; background:linear-gradient(135deg, var(--cyan), var(--purple)); color:#0A0E17;
+    font-weight:bold; font-size:0.9rem; margin-bottom:12px;
+  }
+  .modulo-card h2{ color:var(--cyan); font-size:1.08rem; margin:0 0 8px; line-height:1.35; }
+  .modulo-card .conteo{ color:var(--muted); font-size:0.8rem; }
+  .modulo-card .arrow{ float:right; color:var(--muted); }
+
+  /* Vista expandida de un módulo */
+  .modulo-detalle{ display:none; }
+  .modulo-detalle.open{ display:block; }
+  .volver-modulos{
+    display:inline-flex; align-items:center; gap:6px; color:var(--cyan); text-decoration:none;
+    font-size:0.88rem; margin-bottom:16px; cursor:pointer; background:none; border:none; padding:0;
+  }
+  .modulo-detalle h2{ color:var(--cyan); font-size:1.4rem; margin:0 0 20px; }
+
+  .item-list{ display:flex; flex-direction:column; gap:8px; }
+  .item-row{
+    display:flex; align-items:center; gap:10px; padding:11px 14px; border-radius:10px;
+    background:var(--panel); border:1px solid var(--border); text-decoration:none; color:var(--text);
+    font-size:0.88rem;
+  }
+  .item-row:hover{ background:var(--card); }
   .badge-tipo{
-    font-size:0.65rem; padding:2px 7px; border-radius:10px; text-transform:uppercase;
-    border:1px solid var(--border); color:var(--muted); flex-shrink:0;
+    font-size:0.62rem; padding:2px 7px; border-radius:10px; text-transform:uppercase;
+    border:1px solid var(--border); color:var(--muted); flex-shrink:0; min-width:56px; text-align:center;
   }
+  .subgrupo{
+    background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:12px 14px; margin-bottom:4px;
+  }
+  .subgrupo-titulo{
+    color:var(--purple); font-weight:bold; font-size:0.85rem; margin-bottom:10px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .subgrupo .item-row{ background:var(--card); margin-bottom:6px; }
+  .subgrupo .item-row:last-child{ margin-bottom:0; }
 </style>
 </head>
 <body>
@@ -56,31 +81,71 @@
 
 <div class="hero">
   <h1>📚 {{ curso.course_title }}</h1>
-  <p>Navega por los módulos del curso. Haz clic en cada sección para ver su contenido.</p>
+  <p>Elige un módulo para ver su contenido.</p>
 </div>
 
 <div class="wrap">
+
+  <!-- Vista de cuadrícula de módulos -->
+  <div id="vistaModulos" class="modulos-grid">
+    {% for seccion in curso.sections %}
+      {% if seccion.activities|length > 0 %}
+      <div class="modulo-card" onclick="abrirModulo('{{ loop.index0 }}')">
+        <div class="modulo-num">{{ loop.index }}</div>
+        <span class="arrow">→</span>
+        <h2>{{ seccion.name }}</h2>
+        <div class="conteo">{{ seccion.activities|length }} elemento{{ 's' if seccion.activities|length != 1 else '' }}</div>
+      </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+
+  <!-- Vistas detalladas de cada módulo (una por sección, ocultas hasta que se abren) -->
   {% for seccion in curso.sections %}
     {% if seccion.activities|length > 0 %}
-    <div class="seccion">
-      <div class="seccion-head" onclick="this.parentElement.classList.toggle('open')">
-        <span>{{ seccion.name }}</span>
-        <span class="arrow">▶</span>
-      </div>
-      <div class="seccion-body">
+    <div class="modulo-detalle" id="modulo-{{ loop.index0 }}">
+      <button class="volver-modulos" onclick="cerrarModulo()">← Volver a los módulos</button>
+      <h2>{{ seccion.name }}</h2>
+      <div class="item-list">
         {% for act in seccion.activities %}
-          {% if act.type != 'subsection' %}
-          <a class="actividad" href="/curso/actividad/{{ act.moduleid }}">
-            <span class="badge-tipo">{{ act.type }}</span>
-            <span>{{ act.title }}</span>
-          </a>
+          {% if act.children %}
+            <div class="subgrupo">
+              <div class="subgrupo-titulo">📁 {{ act.title }}</div>
+              {% for child in act.children %}
+                <a class="item-row" href="/curso/actividad/{{ child.moduleid }}">
+                  <span class="badge-tipo">{{ child.type }}</span>
+                  <span>{{ child.title }}</span>
+                </a>
+              {% endfor %}
+            </div>
+          {% elif act.type not in ['subsection'] %}
+            <a class="item-row" href="/curso/actividad/{{ act.moduleid }}">
+              <span class="badge-tipo">{{ act.type }}</span>
+              <span>{{ act.title }}</span>
+            </a>
           {% endif %}
         {% endfor %}
       </div>
     </div>
     {% endif %}
   {% endfor %}
+
 </div>
+
+<script>
+  function abrirModulo(idx) {
+    document.getElementById('vistaModulos').style.display = 'none';
+    document.querySelectorAll('.modulo-detalle').forEach(el => el.classList.remove('open'));
+    const el = document.getElementById('modulo-' + idx);
+    if (el) el.classList.add('open');
+    window.scrollTo(0, 0);
+  }
+  function cerrarModulo() {
+    document.querySelectorAll('.modulo-detalle').forEach(el => el.classList.remove('open'));
+    document.getElementById('vistaModulos').style.display = 'grid';
+    window.scrollTo(0, 0);
+  }
+</script>
 
 </body>
 </html>
