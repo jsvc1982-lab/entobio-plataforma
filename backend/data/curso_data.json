@@ -18,11 +18,11 @@
               "moduleid": "482",
               "type": "label",
               "title": "MACROFOTOGRAFIA",
-              "content_html": "<p style=\"text-align: center;\"><img class=\"img-fluid\" src=\"/static/curso_files/727aef9890/Imagen1.jpg\" alt=\"MACRO\" width=\"300\" height=\"176\"></p>",
+              "content_html": "<p style=\"text-align: center;\"><img class=\"img-fluid\" src=\"/static/curso_files/727aef9890/imagen1.jpg\" alt=\"MACRO\" width=\"300\" height=\"176\"></p>",
               "files": [
                 {
                   "filename": "Imagen1.jpg",
-                  "url": "/static/curso_files/727aef9890/Imagen1.jpg",
+                  "url": "/static/curso_files/727aef9890/imagen1.jpg",
                   "mimetype": "image/jpeg"
                 }
               ],
@@ -32,11 +32,11 @@
               "moduleid": "483",
               "type": "label",
               "title": "MODELADO 3D",
-              "content_html": "<p> <video title=\"MODELADO 3D\" muted=\"true\" controls=\"controls\" width=\"1280\" height=\"662\">\n        <source src=\"/static/curso_files/26bd81f5e0/ESTE.mp4\">\n    \n</video> </p>",
+              "content_html": "<p> <video title=\"MODELADO 3D\" muted=\"true\" controls=\"controls\" width=\"1280\" height=\"662\">\n        <source src=\"/static/curso_files/26bd81f5e0/este.mp4\">\n    \n</video> </p>",
               "files": [
                 {
                   "filename": "ESTE.mp4",
-                  "url": "/static/curso_files/26bd81f5e0/ESTE.mp4",
+                  "url": "/static/curso_files/26bd81f5e0/este.mp4",
                   "mimetype": "video/mp4"
                 }
               ],
@@ -92,7 +92,7 @@
               "files": [
                 {
                   "filename": "Manual-de-identificaciòn-de-Insectos-Arañas-y-otros-Artròpodos-Terrestres-George-C.-McGavin-Omega-2000 (1).pdf",
-                  "url": "/static/curso_files/40833afb18/Manual-de-identificaciòn-de-Insectos-Arañas-y-otros-Artròpodos-Terrestres-George-C.-McGavin-Omega-2000 (1).pdf",
+                  "url": "/static/curso_files/40833afb18/manual-de-identificacion-de-insectos-aranas-y-otros-artropod.pdf",
                   "mimetype": "application/pdf"
                 }
               ],
@@ -232,24 +232,42 @@
               "moduleid": "523",
               "type": "label",
               "title": "Área de texto y medios (copia) (copia)",
-              "content_html": "<div style=\"text-align: center;\">\n<h3>Vista Frontal</h3>\n<input id=\"slider3\" style=\"width: 80%;\" max=\"360\" min=\"0\" step=\"1\" type=\"range\" value=\"0\"> <br><br><img id=\"img3\" style=\"transition: 0.2s;\" src=\"$@PLUGINFILEBYCONTEXT*732@$/mod_label/intro/g3.png\" width=\"280\">\n<p id=\"angle3\">Ángulo: 0°</p>\n</div>\n<script>\nconst slider3 = document.getElementById(\"slider3\");\nconst img3 = document.getElementById(\"img3\");\nconst ang3 = document.getElementById(\"angle3\");\n\nslider3.oninput = function() {\n    img3.style.transform = \"rotate(\" + this.value + \"deg)\";\n    ang3.textContent = \"Ángulo: \" + this.value + \"°\";\n}\n</script>",
-              "files": [],
+              "content_html": "<div style=\"text-align: center;\">\n<h3>Vista Frontal</h3>\n<input id=\"slider3\" style=\"width: 80%;\" max=\"360\" min=\"0\" step=\"1\" type=\"range\" value=\"0\"> <br><br><img id=\"img3\" style=\"transition: 0.2s;\" src=\"/static/curso_files/4a3fe0b0be/g3.png\" width=\"280\">\n<p id=\"angle3\">Ángulo: 0°</p>\n</div>\n<script>\nconst slider3 = document.getElementById(\"slider3\");\nconst img3 = document.getElementById(\"img3\");\nconst ang3 = document.getElementById(\"angle3\");\n\nslider3.oninput = function() {\n    img3.style.transform = \"rotate(\" + this.value + \"deg)\";\n    ang3.textContent = \"Ángulo: \" + this.value + \"°\";\n}\n</script>",
+              "files": [
+                {
+                  "filename": "g3.png",
+                  "url": "/static/curso_files/4a3fe0b0be/g3.png",
+                  "mimetype": "image/png"
+                }
+              ],
               "children": null
             },
             {
               "moduleid": "522",
               "type": "label",
               "title": "Área de texto y medios (copia)",
-              "content_html": "<div style=\"text-align: center;\">\n<h3>Vista Dorsal</h3>\n<input id=\"slider2\" style=\"width: 80%;\" max=\"360\" min=\"0\" step=\"1\" type=\"range\" value=\"0\"> <br><br><img id=\"img2\" style=\"transition: 0.2s;\" src=\"$@PLUGINFILEBYCONTEXT*731@$/mod_label/intro/g2.png\" width=\"280\">\n<p id=\"angle2\">Ángulo: 0°</p>\n</div>\n<script>\nconst slider2 = document.getElementById(\"slider2\");\nconst img2 = document.getElementById(\"img2\");\nconst ang2 = document.getElementById(\"angle2\");\n\nslider2.oninput = function() {\n    img2.style.transform = \"rotate(\" + this.value + \"deg)\";\n    ang2.textContent = \"Ángulo: \" + this.value + \"°\";\n}\n</script>",
-              "files": [],
+              "content_html": "<div style=\"text-align: center;\">\n<h3>Vista Dorsal</h3>\n<input id=\"slider2\" style=\"width: 80%;\" max=\"360\" min=\"0\" step=\"1\" type=\"range\" value=\"0\"> <br><br><img id=\"img2\" style=\"transition: 0.2s;\" src=\"/static/curso_files/0a09325eb3/g2.png\" width=\"280\">\n<p id=\"angle2\">Ángulo: 0°</p>\n</div>\n<script>\nconst slider2 = document.getElementById(\"slider2\");\nconst img2 = document.getElementById(\"img2\");\nconst ang2 = document.getElementById(\"angle2\");\n\nslider2.oninput = function() {\n    img2.style.transform = \"rotate(\" + this.value + \"deg)\";\n    ang2.textContent = \"Ángulo: \" + this.value + \"°\";\n}\n</script>",
+              "files": [
+                {
+                  "filename": "g2.png",
+                  "url": "/static/curso_files/0a09325eb3/g2.png",
+                  "mimetype": "image/png"
+                }
+              ],
               "children": null
             },
             {
               "moduleid": "521",
               "type": "label",
               "title": "Área de texto y medios",
-              "content_html": "<div style=\"text-align: center;\">\n<h3>Vista Lateral</h3>\n<input id=\"slider1\" style=\"width: 80%;\" max=\"360\" min=\"0\" step=\"1\" type=\"range\" value=\"0\"> <br><br><img id=\"img1\" style=\"transition: 0.2s;\" src=\"$@PLUGINFILEBYCONTEXT*730@$/mod_label/intro/g1.png\" width=\"280\">\n<p id=\"angle1\">Ángulo: 0°</p>\n</div>\n<script>\nconst slider1 = document.getElementById(\"slider1\");\nconst img1 = document.getElementById(\"img1\");\nconst ang1 = document.getElementById(\"angle1\");\n\nslider1.oninput = function() {\n    img1.style.transform = \"rotate(\" + this.value + \"deg)\";\n    ang1.textContent = \"Ángulo: \" + this.value + \"°\";\n}\n</script>",
-              "files": [],
+              "content_html": "<div style=\"text-align: center;\">\n<h3>Vista Lateral</h3>\n<input id=\"slider1\" style=\"width: 80%;\" max=\"360\" min=\"0\" step=\"1\" type=\"range\" value=\"0\"> <br><br><img id=\"img1\" style=\"transition: 0.2s;\" src=\"/static/curso_files/dcc8d355af/g1.png\" width=\"280\">\n<p id=\"angle1\">Ángulo: 0°</p>\n</div>\n<script>\nconst slider1 = document.getElementById(\"slider1\");\nconst img1 = document.getElementById(\"img1\");\nconst ang1 = document.getElementById(\"angle1\");\n\nslider1.oninput = function() {\n    img1.style.transform = \"rotate(\" + this.value + \"deg)\";\n    ang1.textContent = \"Ángulo: \" + this.value + \"°\";\n}\n</script>",
+              "files": [
+                {
+                  "filename": "g1.png",
+                  "url": "/static/curso_files/dcc8d355af/g1.png",
+                  "mimetype": "image/png"
+                }
+              ],
               "children": null
             }
           ],
